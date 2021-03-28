@@ -13,12 +13,10 @@
 
 typedef struct Command {
 	char com[100];
-	int* status;
 	int background;
 	int argc;
 	pid_t pid;
 }Command;
-
 
 void runInBackground(pid_t pid, char* args[]) {
 	if (pid == 0) {
@@ -48,7 +46,6 @@ int cdBack(char* wd) {
 	}
 }
 
-
 void user_input_loop() {
 	int history_counter = 0;
 	Command history[HISTORY_LEN];
@@ -63,7 +60,6 @@ void user_input_loop() {
 		fflush(stdout);
 
 		char input[MAX_COMMAND_LENGTH];
-		// scanf("%s",input);
 		fgets(input, MAX_COMMAND_LENGTH, stdin);
 		if ((strlen(input) > 0) && (input[strlen(input) - 1] == '\n')) {
 			input[strlen(input) - 1] = '\0';
@@ -144,9 +140,7 @@ void user_input_loop() {
 			}
 
 			else {
-				int slashcounter = 0;
 				char* token = strtok(args[1],"/");
-				char* data[100];
 				char temp[100];
 				char temp2[100];
 				strcpy(temp, prev_working_dir);
@@ -158,7 +152,6 @@ void user_input_loop() {
 				}
 				else {
 					while (token != NULL) {
-						slashcounter++;
 						token = strtok(NULL, "/");
 						if(!strcmp("token","..")){
 							strcpy(prev_working_dir, working_directory);
@@ -191,9 +184,7 @@ void user_input_loop() {
 		else if (!strcmp(c.com, "exit")) {
 			exit(0);
 		}
-
-		//NON Built in COMs
-		else {
+		else { //Nonbuilt in commands
 			c.pid = fork();
 			if(c.pid != 0) {
 				history[history_counter-1].pid = c.pid;
@@ -206,10 +197,6 @@ void user_input_loop() {
 				run(c.pid, args);
 			}
 		}
-	}
-	
-	for (int i = 0; i < history_counter; i++) {
-		free(history[i].status);
 	}
 }
 
