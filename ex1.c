@@ -22,13 +22,17 @@ typedef struct Command {
 
 void runInBackground(pid_t pid, char* args[]) {
 	if (pid == 0) {
-		execvp(args[0], args);
+		if(execvp(args[0], args) == -1){
+			printf("%s\n", "exec failed");
+		}
 	}
 }
 
 void run(pid_t pid, char* args[]) {
 	if (pid == 0) {
-		execvp(args[0], args);
+		if(execvp(args[0], args) == -1){
+			printf("%s\n", "exec failed");
+		}
 	}
 	else {
 		wait(NULL);
@@ -83,21 +87,19 @@ void user_input_loop() {
 		if (!strcmp(c.com, "history")) {
 			for (int i = 0; i < history_counter; i++) {
 
-				// waitpid(history[i].pid,NULL,WNOHANG);
-				// int stat;
 				// printf("%s : %d : %d\n", history[i].com, history[i].pid, waitpid(history[i].pid,NULL,WNOHANG));
 				printf("%s", history[i].com);
 				fflush(stdout);
-				if (waitpid(history[i].pid, NULL, WNOHANG) == 0 || i == history_counter-1) {
+				if ((waitpid(history[i].pid, NULL, WNOHANG) == 0) || i == history_counter-1) {
 					printf(" RUNNING\n");
 				}
-				else if (waitpid(history[i].pid, NULL, WNOHANG) == -1) {
+				else if (waitpid(history[i].pid, NULL, WNOHANG) == -1 ) {
 					printf(" DONE\n");
 				}
 			}
 		}
 
-		else if (!strcmp(c.com, "cd")) {
+		else if (!strcmp(args[0], "cd")) {
 			if (c.argc > 2) {
 				printf("Too many argument\n");
 			}
@@ -130,15 +132,13 @@ void user_input_loop() {
 				if (chdir(args[1]) == -1) {
 					printf("chdir failed\n");
 				}
-				strcpy(prev_working_dir, working_directory);
-				getcwd(working_directory, sizeof(working_directory));
 			}
 		}
 
 		else if (!strcmp(c.com, "jobs")) {
 			for (int i = 0; i < history_counter; i++)
 			{
-				if (*history[i].status == 1 && history[i].background) {
+				if ((waitpid(history[i].pid, NULL, WNOHANG) == 0) && history[i].background) {
 					printf("%s\n", history[i].com);;
 				}
 			}
