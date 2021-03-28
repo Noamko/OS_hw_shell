@@ -39,6 +39,16 @@ void run(pid_t pid, char* args[]) {
 	}
 }
 
+int cdBack(char* wd) {
+	for (int i = strlen(wd); i > 0; i--) {
+		if (wd[i] == '/') {
+			wd[i] = '\0';
+			return chdir(wd);
+		}
+	}
+}
+
+
 void user_input_loop() {
 	int history_counter = 0;
 	Command history[HISTORY_LEN];
@@ -86,8 +96,6 @@ void user_input_loop() {
 		//BUILT IN COMMANDS
 		if (!strcmp(c.com, "history")) {
 			for (int i = 0; i < history_counter; i++) {
-
-				// printf("%s : %d : %d\n", history[i].com, history[i].pid, waitpid(history[i].pid,NULL,WNOHANG));
 				printf("%s", history[i].com);
 				fflush(stdout);
 				if ((waitpid(history[i].pid, NULL, WNOHANG) == 0) || i == history_counter-1) {
@@ -103,36 +111,73 @@ void user_input_loop() {
 			if (c.argc > 2) {
 				printf("Too many argument\n");
 			}
+			else if(c.argc == 1) {
+				if (chdir(getenv("HOME")) == -1) {
+					printf("chdir failed\n");
+				}
+				else {
+					strcpy(prev_working_dir, working_directory);
+				}
+			}
 			else if (!strcmp(args[1], "..")) {
-				for (int i = strlen(working_directory); i > 0; i--) {
-					if (working_directory[i] == '/') {
-						strcpy(prev_working_dir, working_directory);
-						working_directory[i] = '\0';
-						chdir(working_directory);
-						break;
-					}
+				char temp[100];
+				strcpy(temp,prev_working_dir);
+				strcpy(prev_working_dir,working_directory);
+				if(cdBack(working_directory) == -1){
+					printf("chdir failed\n");
+					strcpy(prev_working_dir, temp);
 				}
 			}
 			else if (!strcmp(args[1], "~")) {
 				if (chdir(getenv("HOME")) == -1) {
 					printf("chdir failed\n");
 				}
-				strcpy(prev_working_dir, working_directory);
-				getcwd(working_directory, sizeof(working_directory));
+				else{
+					strcpy(prev_working_dir, working_directory);
+				}
 			}
 			else if (!strcmp(args[1], "-")) {
 				if (chdir(prev_working_dir) == -1) {
 					printf("chdir failed\n");
 				}
 				strcpy(prev_working_dir, working_directory);
-				getcwd(working_directory, sizeof(working_directory));
 			}
 
 			else {
+				int slashcounter = 0;
+				char* token = strtok(args[1],"/");
+				char* data[100];
+				char temp[100];
+				char temp2[100];
+				strcpy(temp, prev_working_dir);
+				strcpy(temp2, working_directory);
+				strcpy(prev_working_dir, working_directory);
 				if (chdir(args[1]) == -1) {
 					printf("chdir failed\n");
+					chdir(temp2);
+				}
+				else {
+					while (token != NULL) {
+						slashcounter++;
+						token = strtok(NULL, "/");
+						if(!strcmp("token","..")){
+							strcpy(prev_working_dir, working_directory);
+							if (cdBack(working_directory) == -1) {
+								printf("chdir failed\n");
+								strcpy(prev_working_dir, temp);
+							}
+						}
+						else if(token != NULL){
+							if(chdir(token) == -1){
+								printf("chdir failed\n");
+								strcpy(prev_working_dir, temp);
+								chdir(temp2);
+							}
+						}
+					}
 				}
 			}
+			getcwd(working_directory, sizeof(working_directory));
 		}
 
 		else if (!strcmp(c.com, "jobs")) {
