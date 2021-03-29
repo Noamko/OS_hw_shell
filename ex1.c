@@ -22,6 +22,7 @@ void runInBackground(pid_t pid, char* args[]) {
 	if (pid == 0) {
 		if(execvp(args[0], args) == -1){
 			printf("%s\n", "exec failed");
+			exit(1);
 		}
 	}
 }
@@ -30,6 +31,7 @@ void run(pid_t pid, char* args[]) {
 	if (pid == 0) {
 		if(execvp(args[0], args) == -1){
 			printf("%s\n", "exec failed");
+			exit(1);
 		}
 	}
 	else {
@@ -94,10 +96,10 @@ void user_input_loop() {
 			for (int i = 0; i < history_counter; i++) {
 				printf("%s", history[i].com);
 				fflush(stdout);
-				if ((waitpid(history[i].pid, NULL, WNOHANG) == 0) || i == history_counter-1) {
+				if (((waitpid(history[i].pid, NULL, WNOHANG) == 0) || i == history_counter - 1) && strcmp(history[i].com, "jobs") != 0) {
 					printf(" RUNNING\n");
 				}
-				else if (waitpid(history[i].pid, NULL, WNOHANG) == -1 ) {
+				else if (waitpid(history[i].pid, NULL, WNOHANG) == -1 || !strcmp(history[i].com, "jobs")) {
 					printf(" DONE\n");
 				}
 			}
@@ -105,7 +107,7 @@ void user_input_loop() {
 
 		else if (!strcmp(args[0], "cd")) {
 			if (c.argc > 2) {
-				printf("Too many argument\n");
+				printf("Too many arguments\n");
 			}
 			else if(c.argc == 1) {
 				if (chdir(getenv("HOME")) == -1) {
@@ -136,38 +138,47 @@ void user_input_loop() {
 				if (chdir(prev_working_dir) == -1) {
 					printf("chdir failed\n");
 				}
-				strcpy(prev_working_dir, working_directory);
+				else {
+					strcpy(prev_working_dir, working_directory);
+				}
 			}
 
 			else {
 				char* token = strtok(args[1],"/");
 				char temp[100];
 				char temp2[100];
-				strcpy(temp, prev_working_dir);
-				strcpy(temp2, working_directory);
-				strcpy(prev_working_dir, working_directory);
-				if (chdir(args[1]) == -1) {
-					printf("chdir failed\n");
-					chdir(temp2);
-				}
-				else {
-					while (token != NULL) {
-						token = strtok(NULL, "/");
-						if(!strcmp("token","..")){
-							strcpy(prev_working_dir, working_directory);
-							if (cdBack(working_directory) == -1) {
-								printf("chdir failed\n");
-								strcpy(prev_working_dir, temp);
-							}
-						}
-						else if(token != NULL){
-							if(chdir(token) == -1){
-								printf("chdir failed\n");
-								strcpy(prev_working_dir, temp);
-								chdir(temp2);
-							}
+				strcpy(temp,working_directory);
+				strcpy(temp2,prev_working_dir);
+				strcpy(prev_working_dir,working_directory);
+				while (token != NULL) {
+					if(!strcmp(token,"~")){
+						if (chdir(getenv("HOME")) == -1) {
+							printf("chdir failed\n");
+							strcpy(working_directory,temp);
+							strcpy(prev_working_dir,temp2);
+							break;
 						}
 					}
+					else if(!strcmp(token,"..")) {
+						char temp[100];
+						strcpy(temp, prev_working_dir);
+						strcpy(prev_working_dir, working_directory);
+						if (cdBack(working_directory) == -1) {
+							printf("chdir failed\n");
+							strcpy(working_directory, temp);
+							strcpy(prev_working_dir, temp2);
+							break;
+						}
+					}
+					else {
+						if (chdir(token) == -1) {
+							printf("chdir failed\n");
+							strcpy(working_directory, temp);
+							strcpy(prev_working_dir, temp2);
+							break;
+						}
+					}
+					token = strtok(NULL, "/");
 				}
 			}
 			getcwd(working_directory, sizeof(working_directory));
@@ -176,7 +187,7 @@ void user_input_loop() {
 		else if (!strcmp(c.com, "jobs")) {
 			for (int i = 0; i < history_counter; i++)
 			{
-				if ((waitpid(history[i].pid, NULL, WNOHANG) == 0) && history[i].background) {
+				if ((waitpid(history[i].pid, NULL, WNOHANG) == 0) && history[i].background && strcmp(history[i].com,"jobs") != 0) {
 					printf("%s\n", history[i].com);;
 				}
 			}
@@ -185,6 +196,15 @@ void user_input_loop() {
 			exit(0);
 		}
 		else { //Nonbuilt in commands
+			if(!strcmp(args[0],"echo")){
+				if(args[1][0] == '"' && args[argc -1][strlen(args[argc-1]) -1] == '"'){
+					char* temp;
+					temp = args[1] +1;
+					args[1] = temp;
+					args[argc - 1][strlen(args[argc - 1]) - 1] = '\0';
+
+				}
+			}
 			c.pid = fork();
 			if(c.pid != 0) {
 				history[history_counter-1].pid = c.pid;
