@@ -40,9 +40,12 @@ void run(pid_t pid, char* args[]) {
 }
 
 int cdBack(char* wd) {
-	for (int i = strlen(wd); i > 0; i--) {
+	for (int i = strlen(wd)-1; i >= 0; i--) {
 		if (wd[i] == '/') {
 			wd[i] = '\0';
+			if(!strcmp(wd,"")){
+				strcpy(wd,"/");
+			}
 			return chdir(wd);
 		}
 	}
@@ -143,6 +146,15 @@ void user_input_loop() {
 				}
 			}
 
+			else if (!strcmp(args[1], "/")) {
+				if (chdir("/") == -1) {
+					printf("chdir failed\n");
+				}
+				else {
+					strcpy(prev_working_dir, working_directory);
+				}
+			}
+
 			else {
 				char* token = strtok(args[1],"/");
 				char temp[100];
@@ -150,6 +162,9 @@ void user_input_loop() {
 				strcpy(temp,working_directory);
 				strcpy(temp2,prev_working_dir);
 				strcpy(prev_working_dir,working_directory);
+				if(args[1][0] == '/'){
+					chdir("/");
+				}
 				while (token != NULL) {
 					if(!strcmp(token,"~")){
 						if (chdir(getenv("HOME")) == -1) {
