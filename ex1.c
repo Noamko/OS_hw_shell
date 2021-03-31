@@ -182,7 +182,6 @@ void user_input_loop() {
 			}
 			if(!failed){
 				strcpy(prev_working_dir,working_directory);
-				getcwd(working_directory, sizeof(working_directory));
 			}
 			else {
 				strcpy(working_directory, temp);
@@ -192,6 +191,7 @@ void user_input_loop() {
 				}
 				else printf("chdir failed\n");
 			}
+			getcwd(working_directory, sizeof(working_directory));
 		}
 
 		else if (!strcmp(c.com, "jobs")) {
