@@ -41,7 +41,8 @@ void run(pid_t pid, char* args[]) {
 }
 
 int cdBack(char* wd) {
-	for (int i = strlen(wd)-1; i >= 0; i--) {
+	int i;
+	for (i = strlen(wd)-1; i >= 0; i--) {
 		if (wd[i] == '/') {
 			wd[i] = '\0';
 			if(!strcmp(wd,"")){
@@ -101,7 +102,8 @@ void user_input_loop() {
 
 		//BUILT IN COMMANDS
 		if (!strcmp(c.com, "history")) {
-			for (int i = 0; i < history_counter; i++) {
+			int i;
+			for (i = 0; i < history_counter; i++) {
 				printf("%s", history[i].com);
 				fflush(stdout);
 				if (((waitpid(history[i].pid, NULL, WNOHANG) == 0) || i == history_counter - 1) && strcmp(history[i].com, "jobs") != 0) {
@@ -195,7 +197,8 @@ void user_input_loop() {
 		}
 
 		else if (!strcmp(c.com, "jobs")) {
-			for (int i = 0; i < history_counter; i++)
+			int i;
+			for (i = 0; i < history_counter; i++)
 			{
 				if ((waitpid(history[i].pid, NULL, WNOHANG) == 0) && history[i].background && strcmp(history[i].com,"jobs") != 0) {
 					printf("%s\n", history[i].com);;
