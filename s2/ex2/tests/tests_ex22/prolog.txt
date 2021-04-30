@@ -1,0 +1,18 @@
+-------------- Prolog ---------------
+Once upon a time there was a geek duck.
+Geek duck was a cool duck because it had cool glasses (in its opinion at least)
+Geek_duck was was a good programmer. He knew all kind of non-OOP languages.
+geek_Duck liked C, Assembly and even Pascal, but his favorite language was (as you may guess)
+BASH
+One day, the geek duck studied SOLID
+Can you guess which principle our duck liked the most?
+Right! Liskov Substitution Principle
+Why, you might ask...
+Well, because it likes this genius sentence:
+   "If it Looks like a duck, Quacks like a duck, But needs batteries,
+    You probably have the wrong abstraction"
+Maybe geek_duck is a geek duck, but it will pass the test.
+Will you?
+Can you spot the places I wrote geek duck with an underscore?
+This is to make sure you don't fail the test.
+Just a teaser for you, so you will be eager to continue reading (or for the test to be better): Quavid-19

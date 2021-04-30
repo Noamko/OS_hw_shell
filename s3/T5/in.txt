@@ -1,0 +1,2 @@
+This is a text file.
+This file will be read with a buffer, and written to another file.

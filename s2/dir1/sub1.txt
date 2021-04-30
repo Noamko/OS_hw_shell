@@ -1,0 +1,1 @@
+this is a text from subdir 1

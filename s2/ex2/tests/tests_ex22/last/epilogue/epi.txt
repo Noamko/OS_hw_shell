@@ -1,0 +1,5 @@
+-------- EPILOGUE ----------
+Thank you for reading my story. You think it was ridiculous? boring?
+Who cares, it tested your bash scripts, and it probably worth everything.
+So, see you in the next exercise. I promise I'll try avoid this over-creative mood.
+Or not.

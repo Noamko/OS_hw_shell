@@ -1,0 +1,16 @@
+-------- CHAPTER 3 ---------
+First of all, did you see this file is in the wrong directory? or is it?
+It is to make sure you iterate lexicographically.
+Wow, such a big word lexicographically. Try say that 20 times fast
+So back to our evolving story, our geek duck and Quavid-19.
+It started infecting people, becoming the major Covid variant in Duckland (If algo can invent stupid city names, why can't I?)
+And you know what comes next, implement an algorithm that determines how many contagious relationships there are in Duckland.
+But here's the twist: Use geek duck favorite language.
+Did you follow up all the previous non-sense I was writing?
+If so, you know the answer is BASH!!
+By the way, did you know the #!/bin/bash thing is called Shebang?
+Shebang, such a big word for such a small line
+So, lexicographically this file should be second. Is it really the case?
+The answer and much more in chapter:
+
+echo $[$(cat story3.txt | head -n 1 | tr -d '-' | tr -d ' ' | tr -d "\n" | tail -c 1) + 1]
