@@ -1,1 +1,1 @@
-# OS_hw_shell
+# Operating systems homework repo
