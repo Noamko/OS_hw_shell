@@ -20,7 +20,8 @@ int check_equal(int f1, int f2, int _size) {
 		if (t != bytes_read) {
 			return 0;
 		}
-		for (int i = 0; i < bytes_read; i++) {
+		int i;
+		for (i = 0; i < bytes_read; i++) {
 			if (f1_buffer[i] != f2_buffer[i]) {
 				return 0;
 			}

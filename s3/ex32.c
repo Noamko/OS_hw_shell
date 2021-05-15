@@ -178,8 +178,11 @@ student_report enter_and_run(const char* folder, const char* inputfile, const ch
 	return report;
 }
 
-student_report* ex32(const char* path) {
+student_report* eex(const char* path) {
 	int fd = open(path, O_RDONLY);
+	if(fd < 0){
+		printf("failed to open file");
+	}
 	char buffer[INPUT_SIZE + 1];
 	int bytes_read = INPUT_SIZE;
 	bytes_read = read(fd, buffer, INPUT_SIZE); //taking a risk here that file content is larger then 2048 (not likly at all)
@@ -221,7 +224,6 @@ int main(int argc, char* argv[]) {
 		printf("not enough args");
 		exit(1);
 	}
-	student_report* lst = ex32(argv[1]);
-	create_report(lst);
+	create_report(eex(argv[1]));
 	return 0;
 }
