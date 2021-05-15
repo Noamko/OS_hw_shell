@@ -22,6 +22,7 @@ student_report* add(student_report* sr, const char* name, const char* info, int 
 		sr->score = score;
 		sr->name = name;
 		sr->r_info = info;
+		sr->next = NULL;
 	}
 	else {
 		student_report* temp = sr;
@@ -32,6 +33,7 @@ student_report* add(student_report* sr, const char* name, const char* info, int 
 		temp->next->score = score;
 		temp->next->name = name;
 		temp->next->r_info = info;
+		temp->next->next = NULL;
 	}
 	return sr;
 }
@@ -206,11 +208,10 @@ student_report* ex32(const char* path) {
 
 void create_report(student_report* r) {
 	student_report* temp = r;
-	FILE* fpt = fopen("results1.csv", "w+");
-	char str[255];
-	char score_str[3];
+	FILE* fpt = fopen("results.txt", "w+");
 	while (r != NULL) {
 		fprintf(fpt, "%s,%d,%s\n", r->name, r->score, r->r_info);
+		printf("%s,%d,%s\n", r->name, r->score, r->r_info);
 		r = r->next;
 	}
 	fclose(fpt);
