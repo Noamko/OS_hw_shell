@@ -180,7 +180,7 @@ student_report enter_and_run(const char* folder, const char* inputfile, const ch
 
 student_report* eex(const char* path) {
 	int fd = open(path, O_RDONLY);
-	if(fd < 0){
+	if (fd < 0) {
 		printf("failed to open file");
 	}
 	char buffer[INPUT_SIZE + 1];
@@ -205,6 +205,7 @@ student_report* eex(const char* path) {
 			list = add(list, _report.name, _report.r_info, _report.score);
 		}
 	}
+	chdir("..");
 	closedir(dir);
 	return list;
 }
