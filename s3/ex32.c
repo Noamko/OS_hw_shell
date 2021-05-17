@@ -108,9 +108,12 @@ int enter_and_run(const char* folder, const char* inputfile, const char* currect
 			if (pid == 0) {
 				pid_t pid2 = fork();
 				if (pid2 == 0) {
-					char* argv[2];
-					argv[0] = file;
-					argv[1] = NULL;
+					char* argv[5];
+					argv[0] = "gcc";
+					argv[1] = file;
+					argv[2] = "-o";
+					argv[3] = "temp.out";
+					argv[4] = (char*)NULL;
 
 					if (execvp("gcc", argv) < 0) {
 						exit(3);
@@ -120,7 +123,7 @@ int enter_and_run(const char* folder, const char* inputfile, const char* currect
 					wait(NULL);
 					set_input(inputfile);
 					set_output("output.txt");
-					if (execl("./a.out", (char*)NULL) < 0) {
+					if (execl("./temp.out", (char*)NULL) < 0) {
 						exit(2);
 					}
 				}
@@ -133,7 +136,7 @@ int enter_and_run(const char* folder, const char* inputfile, const char* currect
 			const char* o_file = getFullPath("output.txt");
 			int comp_result = compareFiles(comp, o_file, currect_output);
 			remove("output.txt");
-			remove("a.out");
+			remove("temp.out");
 			closedir(dir);
 			chdir("..");
 			if (elapsed > 5) {
