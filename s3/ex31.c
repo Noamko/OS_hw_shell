@@ -5,6 +5,8 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/fcntl.h>
+#include <stdio.h>
+#include <ctype.h>
 
 int check_equal(int f1, int f2, int _size) {
 	char f1_buffer[_size + 1];
@@ -22,7 +24,9 @@ int check_equal(int f1, int f2, int _size) {
 		}
 		int i;
 		for (i = 0; i < bytes_read; i++) {
-			if (f1_buffer[i] != f2_buffer[i]) {
+			char c = f1_buffer[i];
+			char k = f2_buffer[i];
+			if (c != k) { //checks if char i is equal in both files
 				return 0;
 			}
 		}
@@ -46,8 +50,8 @@ char get_next_nonbreak_char(int fd) {
 int check_similar(int fd1, int fd2, int _size) {
 	char c1, c2;
 	do {
-		c1 = get_next_nonbreak_char(fd1);
-		c2 = get_next_nonbreak_char(fd2);
+		c1 = tolower(get_next_nonbreak_char(fd1));
+		c2 = tolower(get_next_nonbreak_char(fd2));
 		if (c1 == 0 || c2 == 0) {
 			return -1;
 		}
