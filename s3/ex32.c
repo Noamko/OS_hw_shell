@@ -109,7 +109,7 @@ int enter_and_run(const char* folder, const char* inputfile, const char* currect
 				pid_t pid2 = fork();
 				if (pid2 == 0) {
 					if (execl("/usr/bin/gcc", "gcc", file, (char*)NULL) < 0) {
-						exit(2);
+						exit(3);
 					}
 				}
 				else {
@@ -135,7 +135,7 @@ int enter_and_run(const char* folder, const char* inputfile, const char* currect
 			if (elapsed > 5) {
 				return 20;
 			}
-			else if (exit_stat == 2) {
+			else if (exit_stat == 3) {
 				return 10;
 			}
 			else if (comp_result == 1) {
@@ -206,8 +206,6 @@ void eex(const char* path) {
 			case 0:
 				strcat(result, "0,NO_C_FILE\n");
 				break;
-			default:
-				printf("error");
 			}
 		}
 	}
