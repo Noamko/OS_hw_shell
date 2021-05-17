@@ -48,7 +48,7 @@ void set_input(const char* file) {
 }
 
 void set_error(const char* file) {
-	int err = open(file, O_WRONLY | O_CREAT | O_APPEND, 0666);
+	int err = open(file, O_WRONLY | O_CREAT, 0666);
 	if (dup2(err, STDERR_FILENO) < 0) {
 		printf("failed to dup err");
 	}
@@ -77,8 +77,7 @@ int compile_and_run(const char* c_file, const char* input_file, const char* outp
 			argv[1] = temp_c;
 			argv[2] = "-o";
 			argv[3] = "temp.out";
-			argv[4] = (char*)NULL;
-
+			argv[4] = NULL;
 			if (execvp("gcc", argv) < 0) {
 				exit(-1);
 			}
@@ -253,7 +252,6 @@ void eex(const char* path) {
 	int csv_file = open("results.csv", O_CREAT | O_WRONLY, 0666);
 	write(csv_file, result, strlen(result));
 	close(csv_file);
-	printf("%s", result);
 	closedir(dir);
 }
 
