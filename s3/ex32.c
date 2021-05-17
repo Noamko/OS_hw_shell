@@ -64,7 +64,7 @@ void set_input(const char* file) {
 }
 
 void set_error(const char* file) {
-	int err = open(file, O_WRONLY | O_CREAT, 0666);
+	int err = open(file, O_WRONLY | O_CREAT | O_APPEND, 0666);
 	if (dup2(err, STDERR_FILENO) < 0) {
 		printf("failed to dup err");
 	}
@@ -152,7 +152,7 @@ int check_student(const char* folder, const char* inputfile, const char* currect
 			int run_result = compile_and_run(file, inputfile, "output.txt");
 			time(&end);
 			if (run_result < 0) {
-				//error
+				exit(1);
 			}
 			time_t elapsed = end - begin;
 			int comp_result = compareFiles(comp, "output.txt", currect_output);
