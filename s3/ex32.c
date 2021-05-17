@@ -108,7 +108,11 @@ int enter_and_run(const char* folder, const char* inputfile, const char* currect
 			if (pid == 0) {
 				pid_t pid2 = fork();
 				if (pid2 == 0) {
-					if (execl("/usr/bin/gcc", "gcc", file, (char*)NULL) < 0) {
+					char* argv[2];
+					argv[0] = file;
+					argv[1] = NULL;
+
+					if (execvp("gcc", argv) < 0) {
 						exit(3);
 					}
 				}
