@@ -1,7 +1,33 @@
-error1.c: In function 'main':
-error1.c:5:5: error: expected declaration or statement at end of input
-     printf("dfg");
-     ^
+error1.c:6:1: error: expected '}'
+^
+error1.c:4:1: note: to match this '{'
+{
+^
+1 error generated.
+error1.c:6:1: error: expected '}'
+^
+error1.c:4:1: note: to match this '{'
+{
+^
+1 error generated.
+error1.c:6:1: error: expected '}'
+^
+error1.c:4:1: note: to match this '{'
+{
+^
+1 error generated.
+error1.c:6:1: error: expected '}'
+^
+error1.c:4:1: note: to match this '{'
+{
+^
+1 error generated.
+error1.c:6:1: error: expected '}'
+^
+error1.c:4:1: note: to match this '{'
+{
+^
+1 error generated.
 error1.c:6:1: error: expected '}'
 ^
 error1.c:4:1: note: to match this '{'
@@ -21,216 +47,6 @@ error1.c:4:1: note: to match this '{'
 ^
 1 error generated.
 Error in: main
-error1.c:6:1: error: expected '}'
-^
-error1.c:4:1: note: to match this '{'
-{
-^
-1 error generated.
-error1.c:6:1: error: expected '}'
-^
-error1.c:4:1: note: to match this '{'
-{
-^
-1 error generated.
-error1.c:6:1: error: expected '}'
-^
-error1.c:4:1: note: to match this '{'
-{
-^
-1 error generated.
-error1.c:6:1: error: expected '}'
-^
-error1.c:4:1: note: to match this '{'
-{
-^
-1 error generated.
-error1.c:6:1: error: expected '}'
-^
-error1.c:4:1: note: to match this '{'
-{
-^
-1 error generated.
-error1.c:6:1: error: expected '}'
-^
-error1.c:4:1: note: to match this '{'
-{
-^
-1 error generated.
-error1.c:6:1: error: expected '}'
-^
-error1.c:4:1: note: to match this '{'
-{
-^
-1 error generated.
-error1.c:6:1: error: expected '}'
-^
-error1.c:4:1: note: to match this '{'
-{
-^
-1 error generated.
-error1.c:6:1: error: expected '}'
-^
-error1.c:4:1: note: to match this '{'
-{
-^
-1 error generated.
-error1.c:6:1: error: expected '}'
-^
-error1.c:4:1: note: to match this '{'
-{
-^
-1 error generated.
-error1.c:6:1: error: expected '}'
-^
-error1.c:4:1: note: to match this '{'
-{
-^
-1 error generated.
-error1.c:6:1: error: expected '}'
-^
-error1.c:4:1: note: to match this '{'
-{
-^
-1 error generated.
-error1.c:6:1: error: expected '}'
-^
-error1.c:4:1: note: to match this '{'
-{
-^
-1 error generated.
-error1.c:6:1: error: expected '}'
-^
-error1.c:4:1: note: to match this '{'
-{
-^
-1 error generated.
-error1.c:6:1: error: expected '}'
-^
-error1.c:4:1: note: to match this '{'
-{
-^
-1 error generated.
-error1.c:6:1: error: expected '}'
-^
-error1.c:4:1: note: to match this '{'
-{
-^
-1 error generated.
-error1.c:6:1: error: expected '}'
-^
-error1.c:4:1: note: to match this '{'
-{
-^
-1 error generated.
-error1.c:6:1: error: expected '}'
-^
-error1.c:4:1: note: to match this '{'
-{
-^
-1 error generated.
-error1.c:6:1: error: expected '}'
-^
-error1.c:4:1: note: to match this '{'
-{
-^
-1 error generated.
-error1.c:6:1: error: expected '}'
-^
-error1.c:4:1: note: to match this '{'
-{
-^
-1 error generated.
-error1.c:6:1: error: expected '}'
-^
-error1.c:4:1: note: to match this '{'
-{
-^
-1 error generated.
-error1.c:6:1: error: expected '}'
-^
-error1.c:4:1: note: to match this '{'
-{
-^
-1 error generated.
-error1.c:6:1: error: expected '}'
-^
-error1.c:4:1: note: to match this '{'
-{
-^
-1 error generated.
-error1.c:6:1: error: expected '}'
-^
-error1.c:4:1: note: to match this '{'
-{
-^
-1 error generated.
-error1.c:6:1: error: expected '}'
-^
-error1.c:4:1: note: to match this '{'
-{
-^
-1 error generated.
-error1.c:6:1: error: expected '}'
-^
-error1.c:4:1: note: to match this '{'
-{
-^
-1 error generated.
-error1.c:6:1: error: expected '}'
-^
-error1.c:4:1: note: to match this '{'
-{
-^
-1 error generated.
-error1.c:6:1: error: expected '}'
-^
-error1.c:4:1: note: to match this '{'
-{
-^
-1 error generated.
-error1.c:6:1: error: expected '}'
-^
-error1.c:4:1: note: to match this '{'
-{
-^
-1 error generated.
-error1.c:6:1: error: expected '}'
-^
-error1.c:4:1: note: to match this '{'
-{
-^
-1 error generated.
-error1.c:6:1: error: expected '}'
-^
-error1.c:4:1: note: to match this '{'
-{
-^
-1 error generated.
-error1.c:6:1: error: expected '}'
-^
-error1.c:4:1: note: to match this '{'
-{
-^
-1 error generated.
-error1.c:6:1: error: expected '}'
-^
-error1.c:4:1: note: to match this '{'
-{
-^
-1 error generated.
-error1.c:6:1: error: expected '}'
-^
-error1.c:4:1: note: to match this '{'
-{
-^
-1 error generated.
-error1.c:6:1: error: expected '}'
-^
-error1.c:4:1: note: to match this '{'
-{
-^
-1 error generated.
 error1.c:6:1: error: expected '}'
 ^
 error1.c:4:1: note: to match this '{'

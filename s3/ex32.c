@@ -23,22 +23,6 @@ int isDirectory(const char* path) {
 	return S_ISDIR(statbuf.st_mode);
 }
 
-int compareFiles(const char* comp, const char* file1, const char* file2) {
-	pid_t pid = fork();
-	if (pid == 0) {
-		if (execl(comp, comp, file1, file2, (char*)NULL) < 0) {
-			printf("failed to exec");
-			return -1;
-		}
-	}
-	else {
-		int status;
-		wait(&status);
-		return WEXITSTATUS(status);
-	}
-	return -1;
-}
-
 void set_output(const char* file) {
 	int out = open(file, O_WRONLY | O_CREAT, 0666);
 	if (out < 0) {
@@ -81,12 +65,12 @@ int isCFile(const char* file) {
 	return 0;
 }
 
-int compile_and_run(char* c_file, const char* input_file, const char* output_file) {
+int compile_and_run(const char* c_file, const char* input_file, const char* output_file) {
 	pid_t pid = fork();
 	if (pid == 0) {
 		pid_t pid2 = fork();
 		if (pid2 == 0) {
-			char* argv[5];
+			const char* argv[5];
 			argv[0] = "gcc";
 			argv[1] = c_file;
 			argv[2] = "-o";
@@ -94,15 +78,15 @@ int compile_and_run(char* c_file, const char* input_file, const char* output_fil
 			argv[4] = (char*)NULL;
 
 			if (execvp("gcc", argv) < 0) {
-				exit(1);
+				exit(-1);
 			}
 		}
 		else {
 			int gcc_status;
-			wait(&gcc_status);
+			waitpid(pid2, &gcc_status, 0);
 			int gcc_estat = WEXITSTATUS(gcc_status);
-			if (gcc_estat == 1) {
-				exit(1);
+			if (gcc_estat < 0) {
+				exit(-1);
 			}
 			set_input(input_file);
 			set_output(output_file);
@@ -112,18 +96,34 @@ int compile_and_run(char* c_file, const char* input_file, const char* output_fil
 		}
 	}
 	int status;
-	wait(&status);
+	waitpid(pid, &status, 0);
 	int p_estat = WEXITSTATUS(status);
-	if (p_estat == 1) {
+	if (p_estat < 0) {
 		//error gcc didnt run
 		//should never get here.
 		return -1;
 	}
-	else if (p_estat == 2) {
+	if (p_estat == 2) {
 		//comile error
 		return 0;
 	}
 	return 1;
+}
+
+int compareFiles(const char* comp, const char* file1, const char* file2) {
+	pid_t pid = fork();
+	if (pid == 0) {
+		if (execl(comp, "comp.out", file1, file2, (char*)NULL) < 0) {
+			printf("failed to exec");
+			exit(-1);
+		}
+	}
+	else {
+		int status;
+		waitpid(pid, &status, 0);
+		return WEXITSTATUS(status);
+	}
+	return -1;
 }
 
 int check_student(const char* folder, const char* inputfile, const char* currect_output, const char* comp) {
@@ -132,21 +132,26 @@ int check_student(const char* folder, const char* inputfile, const char* currect
 		//errorno
 		printf("error");
 	}
+
 	struct dirent* dn;
 	chdir(folder);
 	int score = 0;
 	while ((dn = readdir(dir)) != NULL) {
 		char* file = dn->d_name;
 		if (isCFile(file)) { // c file found.
+			char output_file[1024];
+			getcwd(output_file, 1024);
+			strcat(output_file, "/");
+			strcat(output_file, "output.txt");
 			time_t begin, end;
 			time(&begin);
-			int run_result = compile_and_run(file, inputfile, "output.txt");
+			int run_result = compile_and_run(file, inputfile, output_file);
 			time(&end);
 			if (run_result < 0) {
-				exit(-11);
+				exit(-1);
 			}
 			time_t elapsed = end - begin;
-			int comp_result = compareFiles(comp, "output.txt", currect_output);
+			int comp_result = compareFiles(comp, output_file, currect_output);
 			if (run_result == 1) {
 				if (elapsed > 5) {
 					score = 20;
@@ -164,19 +169,22 @@ int check_student(const char* folder, const char* inputfile, const char* currect
 			else { // didnt compile
 				score = 10;
 			}
+			remove("output.txt");
+			remove("temp.out");
+			break;
 		}
 	}
-	remove("output.txt");
-	remove("temp.out");
+
 	closedir(dir);
 	chdir("..");
 	return score;
 }
 
-void eex(const char* path, char* mwd) {
+void eex(const char* path) {
 	int fd = open(path, O_RDONLY);
 	if (fd < 0) {
-		printf("failed to open file");
+		printf("failed to open file\n");
+		exit(-1);
 	}
 	char buffer[INPUT_SIZE + 1];
 	int bytes_read = INPUT_SIZE;
@@ -209,7 +217,7 @@ void eex(const char* path, char* mwd) {
 	struct dirent* dn;
 	chdir(_dir);
 
-	char result[1024];
+	char result[2048];
 	strcpy(result, "");
 	while ((dn = readdir(dir)) != NULL) {
 		char* folder = dn->d_name;
@@ -217,25 +225,23 @@ void eex(const char* path, char* mwd) {
 			int student_score = check_student(folder, _input_file, _correct_output_file, comp); // look for a .c file compile and run it.
 			strcat(result, folder);
 			strcat(result, ",");
-			switch (student_score) {
-			case 100:
+			if (student_score == 100) {
 				strcat(result, "100,EXCELLENT\n");
-				break;;
-			case 75:
+			}
+			else if (student_score == 75) {
 				strcat(result, "75,SIMILAR\n");
-				break;
-			case 50:
+			}
+			else if (student_score == 50) {
 				strcat(result, "50,WRONG\n");
-				break;
-			case 20:
+			}
+			else if (student_score == 20) {
 				strcat(result, "20,TIMEOUT\n");
-				break;
-			case 10:
+			}
+			else if (student_score == 10) {
 				strcat(result, "10,COMPILATION_ERROR\n");
-				break;
-			case 0:
+			}
+			else if (student_score == 0) {
 				strcat(result, "0,NO_C_FILE\n");
-				break;
 			}
 		}
 	}
@@ -251,12 +257,9 @@ void eex(const char* path, char* mwd) {
 
 int main(int argc, char* argv[]) {
 	if (argc < 2) {
-		printf("not enough args");
-		exit(1);
+		printf("not enough args\n");
+		exit(-1);
 	}
-	char abs_path[255];
-	getcwd(abs_path, sizeof(abs_path));
-	strcat(abs_path, "/");
-	eex(argv[1], abs_path);
+	eex(argv[1]);
 	return 0;
 }
