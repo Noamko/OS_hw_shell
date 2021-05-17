@@ -70,9 +70,11 @@ int compile_and_run(const char* c_file, const char* input_file, const char* outp
 	if (pid == 0) {
 		pid_t pid2 = fork();
 		if (pid2 == 0) {
-			const char* argv[5];
+			char* argv[5];
+			char temp_c[1024];
+			strcpy(temp_c, c_file);
 			argv[0] = "gcc";
-			argv[1] = c_file;
+			argv[1] = temp_c;
 			argv[2] = "-o";
 			argv[3] = "temp.out";
 			argv[4] = (char*)NULL;
@@ -137,7 +139,7 @@ int check_student(const char* folder, const char* inputfile, const char* currect
 	chdir(folder);
 	int score = 0;
 	while ((dn = readdir(dir)) != NULL) {
-		char* file = dn->d_name;
+		const char* file = dn->d_name;
 		if (isCFile(file)) { // c file found.
 			char output_file[1024];
 			getcwd(output_file, 1024);
