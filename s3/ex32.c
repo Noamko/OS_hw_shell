@@ -64,7 +64,7 @@ void set_input(const char* file) {
 }
 
 void set_error(const char* file) {
-	int err = open(file, O_WRONLY | O_CREAT | O_APPEND, 0666);
+	int err = open(file, O_WRONLY | O_CREAT, 0666);
 	if (dup2(err, STDERR_FILENO) < 0) {
 		printf("failed to dup err");
 	}
@@ -91,7 +91,51 @@ const char* getFullPath(const char* file) {
 	return str;
 }
 
-int enter_and_run(const char* folder, const char* inputfile, const char* currect_output, const char* comp) {
+int compile_and_run(char* c_file, const char* input_file, const char* output_file) {
+	pid_t pid = fork();
+	if (pid == 0) {
+		pid_t pid2 = fork();
+		if (pid2 == 0) {
+			char* argv[5];
+			argv[0] = "gcc";
+			argv[1] = c_file;
+			argv[2] = "-o";
+			argv[3] = "temp.out";
+			argv[4] = (char*)NULL;
+
+			if (execvp("gcc", argv) < 0) {
+				exit(1);
+			}
+		}
+		else {
+			int gcc_status;
+			wait(&gcc_status);
+			int gcc_estat = WEXITSTATUS(gcc_status);
+			if (gcc_estat == 1) {
+				exit(1);
+			}
+			set_input(input_file);
+			set_output(output_file);
+			if (execl("./temp.out", (char*)NULL) < 0) {
+				exit(2);
+			}
+		}
+	}
+	int status;
+	wait(&status);
+	int p_estat = WEXITSTATUS(status);
+	if (p_estat == 1) {
+		//error gcc didnt run
+		//should never get here.
+		return -1;
+	}
+	else if (p_estat == 2) {
+		//comile error
+		return 0;
+	}
+	return 1;
+}
+int check_student(const char* folder, const char* inputfile, const char* currect_output, const char* comp) {
 	DIR* dir = opendir(folder);
 	if (dir == NULL) {
 		//errorno
@@ -99,68 +143,43 @@ int enter_and_run(const char* folder, const char* inputfile, const char* currect
 	}
 	struct dirent* dn;
 	chdir(folder);
+	int score = 0;
 	while ((dn = readdir(dir)) != NULL) {
 		char* file = dn->d_name;
 		if (isCFile(file)) { // c file found.
 			time_t begin, end;
 			time(&begin);
-			pid_t pid = fork();
-			if (pid == 0) {
-				pid_t pid2 = fork();
-				if (pid2 == 0) {
-					char* argv[5];
-					argv[0] = "gcc";
-					argv[1] = file;
-					argv[2] = "-o";
-					argv[3] = "temp.out";
-					argv[4] = (char*)NULL;
-
-					if (execvp("gcc", argv) < 0) {
-						exit(3);
-					}
-				}
-				else {
-					wait(NULL);
-					set_input(inputfile);
-					set_output("output.txt");
-					if (execl("./temp.out", (char*)NULL) < 0) {
-						exit(2);
-					}
-				}
-			}
-			int status;
-			wait(&status);
+			int run_result = compile_and_run(file, inputfile, "output.txt");
 			time(&end);
+			if (run_result < 0) {
+				//error
+			}
 			time_t elapsed = end - begin;
-			int exit_stat = WEXITSTATUS(status);
-			const char* o_file = getFullPath("output.txt");
-			int comp_result = compareFiles(comp, o_file, currect_output);
-			remove("output.txt");
-			remove("temp.out");
-			closedir(dir);
-			chdir("..");
-			if (elapsed > 5) {
-				return 20;
+			int comp_result = compareFiles(comp, "output.txt", currect_output);
+			if (run_result == 1) {
+				if (elapsed > 5) {
+					score = 20;
+				}
+				else if (comp_result == 1) {
+					score = 100;
+				}
+				else if (comp_result == 2) {
+					score = 50;
+				}
+				else if (comp_result == 3) {
+					score = 75;
+				}
 			}
-			else if (exit_stat == 2) {
-				return 10;
+			else { // didnt compile
+				score = 10;
 			}
-			else if (comp_result == 1) {
-				return 100;
-			}
-			else if (comp_result == 2) {
-				return 50;
-			}
-			else if (comp_result == 3) {
-				return 75;
-			}
-			continue;
 		}
 	}
-	//fail no c file
+	remove("output.txt");
+	remove("temp.out");
 	closedir(dir);
 	chdir("..");
-	return 0;
+	return score;
 }
 
 void eex(const char* path) {
@@ -191,10 +210,10 @@ void eex(const char* path) {
 	while ((dn = readdir(dir)) != NULL) {
 		char* folder = dn->d_name;
 		if (isDirectory(folder) && strcmp(folder, "..") != 0 && strcmp(folder, ".") != 0) {
-			int r_score = enter_and_run(folder, _input_file, _correct_output_file, comp); // look for a .c file compile and run it.
+			int student_score = check_student(folder, _input_file, _correct_output_file, comp); // look for a .c file compile and run it.
 			strcat(result, folder);
 			strcat(result, ",");
-			switch (r_score) {
+			switch (student_score) {
 			case 100:
 				strcat(result, "100,EXCELLENT\n");
 				break;;
