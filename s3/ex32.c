@@ -135,7 +135,7 @@ int enter_and_run(const char* folder, const char* inputfile, const char* currect
 			if (elapsed > 5) {
 				return 20;
 			}
-			else if (exit_stat == 3) {
+			else if (exit_stat == 2) {
 				return 10;
 			}
 			else if (comp_result == 1) {
@@ -147,7 +147,7 @@ int enter_and_run(const char* folder, const char* inputfile, const char* currect
 			else if (comp_result == 3) {
 				return 75;
 			}
-			return 0; // 
+			continue;
 		}
 	}
 	//fail no c file
