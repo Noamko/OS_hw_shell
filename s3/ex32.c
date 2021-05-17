@@ -81,16 +81,6 @@ int isCFile(const char* file) {
 	return 0;
 }
 
-const char* getFullPath(const char* file) {
-	char* str = malloc(255);
-	char path[255];
-	getcwd(path, sizeof(path));
-	strcat(path, "/");
-	strcat(path, file);
-	strcpy(str, path);
-	return str;
-}
-
 int compile_and_run(char* c_file, const char* input_file, const char* output_file) {
 	pid_t pid = fork();
 	if (pid == 0) {
@@ -135,6 +125,7 @@ int compile_and_run(char* c_file, const char* input_file, const char* output_fil
 	}
 	return 1;
 }
+
 int check_student(const char* folder, const char* inputfile, const char* currect_output, const char* comp) {
 	DIR* dir = opendir(folder);
 	if (dir == NULL) {
@@ -152,7 +143,7 @@ int check_student(const char* folder, const char* inputfile, const char* currect
 			int run_result = compile_and_run(file, inputfile, "output.txt");
 			time(&end);
 			if (run_result < 0) {
-				exit(1);
+				exit(-11);
 			}
 			time_t elapsed = end - begin;
 			int comp_result = compareFiles(comp, "output.txt", currect_output);
@@ -182,7 +173,7 @@ int check_student(const char* folder, const char* inputfile, const char* currect
 	return score;
 }
 
-void eex(const char* path) {
+void eex(const char* path, char* mwd) {
 	int fd = open(path, O_RDONLY);
 	if (fd < 0) {
 		printf("failed to open file");
@@ -193,9 +184,22 @@ void eex(const char* path) {
 	close(fd);
 	set_error(("errors.txt"));
 	const char* _dir = strtok(buffer, "\n");
-	const char* _input_file = getFullPath(strtok(NULL, "\n"));
-	const char* _correct_output_file = getFullPath(strtok(NULL, "\n"));
-	const char* comp = getFullPath("comp.out");
+
+	char _input_file[1024];
+	getcwd(_input_file, 1024);
+	strcat(_input_file, "/");
+	strcat(_input_file, strtok(NULL, "\n"));
+
+
+	char _correct_output_file[1024];
+	getcwd(_correct_output_file, 1024);
+	strcat(_correct_output_file, "/");
+	strcat(_correct_output_file, strtok(NULL, "\n"));
+
+	char comp[1024];
+	getcwd(comp, 1024);
+	strcat(comp, "/");
+	strcat(comp, "comp.out");
 
 	DIR* dir = opendir(_dir);
 	if (dir == NULL) {
@@ -241,6 +245,7 @@ void eex(const char* path) {
 	int csv_file = open("results.csv", O_CREAT | O_WRONLY, 0666);
 	write(csv_file, result, strlen(result));
 	close(csv_file);
+	printf("%s", result);
 	closedir(dir);
 }
 
@@ -249,6 +254,9 @@ int main(int argc, char* argv[]) {
 		printf("not enough args");
 		exit(1);
 	}
-	eex(argv[1]);
+	char abs_path[255];
+	getcwd(abs_path, sizeof(abs_path));
+	strcat(abs_path, "/");
+	eex(argv[1], abs_path);
 	return 0;
 }
