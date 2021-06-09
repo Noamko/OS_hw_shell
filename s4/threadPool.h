@@ -1,5 +1,5 @@
-#ifndef __THREAD_POOL__
-#define __THREAD_POOL__
+#ifndef _thread_pool_item_POOL__
+#define _thread_pool_item_POOL__
 
 #include <pthread.h>
 #include <stdio.h>
@@ -8,17 +8,12 @@
 
 #include "osqueue.h"
 
-typedef struct thread_instance {
-    pthread_t thread;
-    int isRunning;
-
-} _Thread;
-
 typedef struct thread_pool {
     int numOfThreads;
-    pthread_t main_thread;
+    int isDestroyed;
+    pthread_mutex_t lock;
     OSQueue* queue;
-    _Thread** threads;
+    pthread_t* threads;
 
 } ThreadPool;
 

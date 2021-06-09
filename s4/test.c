@@ -8,7 +8,7 @@ void hello(void* a) {
     printf("hello\n");
 }
 
-void test_thread_pool_sanity() {
+void testthread_pool_item_pool_sanity() {
     int i;
 
     ThreadPool* tp = tpCreate(2);
@@ -20,7 +20,7 @@ void test_thread_pool_sanity() {
 }
 
 int main() {
-    test_thread_pool_sanity();
+    testthread_pool_item_pool_sanity();
 
     return 0;
 }

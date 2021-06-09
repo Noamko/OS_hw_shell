@@ -1,67 +1,67 @@
 #include "threadPool.h"
 
-void runTask(void **args) {
-    Task *task = (Task *)args[0];
-    void *self = args[1];
-    task->computeFunc(task->param);
-    ((_Thread *)self)->isRunning = 0;
-    free(task);
-}
-
-void *threadLoop(void *pool) {
-    ThreadPool *_threadpool = (ThreadPool *)pool;
+void threadLoop(void *pool) {
+    ThreadPool *tp = (ThreadPool *)pool;
     while (1) {
-        sleep(1);
-        if (!osIsQueueEmpty(_threadpool->queue)) {
-            for (int i = 0; i < _threadpool->numOfThreads; i++) {
-                if (!_threadpool->threads[i]->isRunning) {
-                    _threadpool->threads[i]->isRunning = 1;
-                    Task *task = (Task *)osDequeue(_threadpool->queue);
-                    _Thread *t = _threadpool->threads[i];
-                    void *args[2] = {task, t};
-                    if (pthread_create(&_threadpool->threads[i]->thread, NULL, (void *)runTask, args)) {
-                        perror("error");
-                    }
-                    break;
-                }
-            }
+        Task *task;
+        int tookTask = 0;
+        pthread_mutex_lock(&tp->lock);  // lock queue acsess
+        if (osIsQueueEmpty(tp->queue) != 1) {
+            task = (Task *)osDequeue(tp->queue);
+            tookTask = 1;
+        }
+        pthread_mutex_unlock(&tp->lock);  // unlock queue acsess
+        if (tookTask) {                   // if the task was enqeued run it
+            task->computeFunc(task->param);
+            free(task);  // free the task pointer
         }
     }
 }
 ThreadPool *tpCreate(int numOfThreads) {
     ThreadPool *pool = malloc(sizeof(ThreadPool));
     pool->queue = osCreateQueue();
-    pool->threads = malloc(sizeof(_Thread *) * numOfThreads);
-    pool->numOfThreads = numOfThreads;
-    for (int i = 0; i < numOfThreads; i++) {
-        pool->threads[i] = malloc(sizeof(_Thread));
-        pool->threads[i]->isRunning = 0;
+    pool->threads = malloc(sizeof(pthread_t) * numOfThreads);
+    if (pool->threads == NULL) {
+        perror("Error in system call");
     }
+    pool->numOfThreads = numOfThreads;
+    pool->isDestroyed = 0;
 
-    if (pthread_create(&pool->main_thread, NULL, threadLoop, pool) < 0) {
-        perror("failed to create thread");
+    int i;
+    for (i = 0; i < numOfThreads; i++) {
+        if (pthread_create(&pool->threads[i], NULL, (void *)threadLoop, pool)) {
+            perror("Error in system call");
+        }
     }
     return pool;
 }
 
 void tpDestroy(ThreadPool *threadPool, int shouldWaitForTasks) {
+    threadPool->isDestroyed = 1;
     if (shouldWaitForTasks) {
         while (osIsQueueEmpty(threadPool->queue) != 1) {
+            //do nothing wait for threads to finish the queue.
         }
-        pthread_cancel(threadPool->main_thread);
-    } else {
-        pthread_cancel(threadPool->main_thread);
     }
-    pthread_join(threadPool->main_thread, NULL);
-    osDestroyQueue(threadPool->queue);
-    for (int i = 0; i < threadPool->numOfThreads; i++) {
-        free(threadPool->threads[i]);
+    int i;
+    for (i = 0; i < threadPool->numOfThreads; i++) {
+        if (pthread_cancel(threadPool->threads[i]) < 0) {
+            perror("Error in system call");
+        }
     }
+    free(threadPool->threads);
     free(threadPool);
+    osDestroyQueue(threadPool->queue);
 }
 
 int tpInsertTask(ThreadPool *threadPool, void (*computeFunc)(void *), void *param) {
+    if (threadPool->isDestroyed) {
+        return -1;
+    }
     Task *task = malloc(sizeof(Task));
+    if (task == NULL) {
+        perror("Error in system call");
+    }
     task->computeFunc = computeFunc;
     task->param = param;
     osEnqueue(threadPool->queue, task);
