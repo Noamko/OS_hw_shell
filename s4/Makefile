@@ -1,13 +1,13 @@
 all: test clean
 
 test: threadPool.o
-	gcc -g test.c threadPool.o osqueue.o -lpthread
+	gcc test.c threadPool.o osqueue.o -lpthread
 
 threadPool.o: osqueue.o
-	gcc -g -c threadPool.c
+	gcc -c threadPool.c
 
 osqueue.o:
-	gcc -g -c osqueue.c
+	gcc -c osqueue.c
 
 clean: 
 	rm -f *.o

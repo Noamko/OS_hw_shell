@@ -6,14 +6,15 @@
 #include "threadPool.h"
 void hello(void* a) {
     printf("hello\n");
+    sleep(1);
 }
 
 void testthread_pool_item_pool_sanity() {
     int i;
 
-    ThreadPool* tp = tpCreate(2);
+    ThreadPool* tp = tpCreate(5);
 
-    for (i = 0; i < 3; ++i) {
+    for (i = 0; i < 10; ++i) {
         tpInsertTask(tp, hello, NULL);
     }
     tpDestroy(tp, 1);
