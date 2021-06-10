@@ -18,7 +18,10 @@ void threadLoop(void *pool) {
             exit(-1);
         }                // unlock queue acsess
         if (tookTask) {  // if the task was enqeued run it
-            task->computeFunc(task->param);
+            if (task == NULL) {
+                perror("Task error");
+            } else
+                task->computeFunc(task->param);
             // free(task);  // free the task pointer
         }
     }
@@ -26,12 +29,11 @@ void threadLoop(void *pool) {
 ThreadPool *tpCreate(int numOfThreads) {
     if (numOfThreads <= 0) {
         perror("invalid thread count");
-        exit(-1);
+        return NULL;
     }
     ThreadPool *pool = malloc(sizeof(ThreadPool));
     if (pool == NULL) {
         perror("failed to create thread pool (malloc failed)");
-        exit(-1);
     }
     pool->queue = osCreateQueue();
     pool->threads = malloc(sizeof(pthread_t) * numOfThreads);
