@@ -13,7 +13,7 @@ void testthread_pool_item_pool_sanity() {
 
     ThreadPool* tp = tpCreate(2);
 
-    for (i = 0; i < 5; ++i) {
+    for (i = 0; i < 3; ++i) {
         tpInsertTask(tp, hello, NULL);
     }
     tpDestroy(tp, 1);
