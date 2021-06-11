@@ -24,7 +24,7 @@ int isDirectory(const char* path) {
 }
 
 void set_output(const char* file) {
-	int out = open(file, O_WRONLY | O_CREAT, 0666);
+	int out = open(file, O_WRONLY | O_CREAT | O_TRUNC, 0666);
 	if (out < 0) {
 		printf("Output file not exist");
 	}
