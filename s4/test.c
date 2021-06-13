@@ -5,22 +5,20 @@
 #include "osqueue.h"
 #include "threadPool.h"
 void hello(void* a) {
-    printf("hello\n");
+    int t = *(int*)a;
+    printf("%d\n", t);
+    free(a);
 }
 
 void testthread_pool_item_pool_sanity() {
     int i;
 
     ThreadPool* tp = tpCreate(5);
-    if (tp == NULL) {
-        perror("tp is NULL");
-        exit(-1);
-    }
 
-    for (i = 0; i < 10; ++i) {
-        if (tpInsertTask(tp, hello, NULL) < 0) {
-            perror("failed to insert");
-        }
+    for (i = 0; i < 100; ++i) {
+        int* t = malloc(sizeof(int));
+        *t = i;
+        tpInsertTask(tp, (void*)hello, t);
     }
     tpDestroy(tp, 1);
 }

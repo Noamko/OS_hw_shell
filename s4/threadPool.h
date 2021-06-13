@@ -11,7 +11,9 @@
 typedef struct thread_pool {
     int numOfThreads;
     int isDestroyed;
+    int running;
     pthread_mutex_t lock;
+    pthread_cond_t cond;
     OSQueue* queue;
     pthread_t* threads;
 
