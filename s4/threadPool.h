@@ -1,5 +1,6 @@
-#ifndef _thread_pool_item_POOL__
-#define _thread_pool_item_POOL__
+//Noam Koren 308192871
+#ifndef __THREAD_POOL__
+#define __THREAD_POOL__
 
 #include <pthread.h>
 #include <stdio.h>
@@ -11,8 +12,9 @@
 typedef struct thread_pool {
     int numOfThreads;
     int isDestroyed;
-    int running;
-    pthread_mutex_t lock;
+    int exitloop;
+    pthread_mutex_t flock;
+    pthread_mutex_t slock;
     pthread_cond_t cond;
     OSQueue* queue;
     pthread_t* threads;

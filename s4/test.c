@@ -12,8 +12,7 @@ void hello(void* a) {
 
 void testthread_pool_item_pool_sanity() {
     int i;
-
-    ThreadPool* tp = tpCreate(5);
+    ThreadPool* tp = tpCreate(100);
 
     for (i = 0; i < 100; ++i) {
         int* t = malloc(sizeof(int));
